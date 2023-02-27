@@ -8,10 +8,11 @@
         </div>
         <div class="main-header-right">
             <div class="dropdown main-profile-menu">
-                <a class="main-img-user" href=""><img alt="avatar" src="{{ asset ('assets/img/brand/users.png') }}"></a>
+                <a class="main-img-user" href=""><img alt="avatar"
+                        src="{{ asset('assets/img/brand/users.png') }}"></a>
                 <div class="dropdown-menu">
                     <div class="header-navheading">
-                        <h6 class="main-notification-title text-capitalize">{{ Auth::User()->email }}</h6>
+                        <h6 class="main-notification-title text-capitalize">{{ Auth::User()->name }}</h6>
                     </div>
                     <a class="dropdown-item" href="{{ url('admin/logout') }}">
                         <i class="fe fe-power"></i> Log Out

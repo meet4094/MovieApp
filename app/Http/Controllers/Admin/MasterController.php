@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\MasterModel;
 use DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class MasterController extends Controller
 {
@@ -77,17 +78,17 @@ class MasterController extends Controller
 
     public function delete_user_data(Request $req)
     {
-        $data = $this->MasterModel->delete_app_data($req->all());
+        $data = $this->MasterModel->delete_user_data($req->all());
         return $data;
     }
 
-    // Status Image Category Data
+    // Image Category Data
 
-    public function add_status_image_category(Request $req)
+    public function add_image_category(Request $req)
     {
         if (empty($req->catId)) {
             $rules = array(
-                'category' => 'required|unique:status_image_category,catName',
+                'category' => 'required|unique:image_category,catName',
                 'image' => 'required|mimes:jpeg,jpg,png,gif',
             );
         } else {
@@ -103,23 +104,27 @@ class MasterController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         } else {
-            $data = $this->MasterModel->add_status_image_category($req->all());
+            $data = $this->MasterModel->add_image_category($req->all());
             return $data;
         }
     }
 
-    public function status_image_category_list(Request $request)
+    public function image_category_list(Request $request)
     {
         if ($request->ajax()) {
-            $data = DB::table('status_image_category')->where(array('is_deleted' => 0));
+            $data = DB::table('image_category as ic');
+            $data->join('users as u', 'u.id', '=', 'ic.user_id');
+            $data->where(array('ic.user_id' => Auth::User()->id));
+            $data->where(array('is_deleted' => 0));
+            $data->get('ic.*', 'u.name');
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->editColumn('image', function ($row) {
-                    $url = asset('images/statusimages/' . $row->slug_name);
+                    $url = asset('images/' . $row->slug_name);
                     return '<a target="_blank" href="' . $url . '/' . $row->image . '"><img src="  ' . $url . '/' . $row->image . ' " height="100"></a>';
                 })
                 ->addColumn('action', function ($row) {
-                    $update_btn = '<button title="' . $row->catName . '" class="btn btn-link" onclick="edit_status_image_category(this)" data-val="' . $row->catId . '"><i class="far fa-edit"></i></button>';
+                    $update_btn = '<button title="' . $row->catName . '" class="btn btn-link" onclick="edit_image_category(this)" data-val="' . $row->catId . '"><i class="far fa-edit"></i></button>';
                     $delete_btn = '<button data-toggle="modal" target="_blank"  title="' . $row->catName . '" class="btn btn-link" onclick="editable_remove(this)" data-val="' . $row->catId . '" tabindex="-1"><i class="fa fa-trash-alt tx-danger"></i></button>';
                     return $update_btn . $delete_btn;
                 })
@@ -128,37 +133,37 @@ class MasterController extends Controller
         }
     }
 
-    public function delete_status_image_category(Request $req)
+    public function delete_image_category(Request $req)
     {
-        $data = $this->MasterModel->delete_status_image_category($req->all());
+        $data = $this->MasterModel->delete_image_category($req->all());
         return $data;
     }
 
-    public function get_status_image_category_data(Request $request)
+    public function get_image_category_data(Request $request)
     {
         if ($request->ajax()) {
-            $categorydata = DB::table('status_image_category')->where(array('catId' => $request->id))->first();
+            $categorydata = DB::table('image_category')->where(array('catId' => $request->id))->first();
         }
         $data = array();
         $data = ([
             'catId' => $categorydata->catId,
             'catName' => $categorydata->catName,
-            'image' => asset('images/statusimages/' . $categorydata->slug_name) . '/' . $categorydata->image,
+            'image' => asset('images/' . $categorydata->slug_name) . '/' . $categorydata->image,
         ]);
         $response = array('st' => "success", "msg" => $data);
         return response()->json($response);
     }
 
 
-    // Status Image Data
+    // Image Data
 
-    public function get_status_image_Category(Request $request)
+    public function get_image_Category(Request $request)
     {
         $search = $request->searchTerm;
         if ($search == '') {
-            $categories = DB::table('status_image_category')->where(array('is_deleted' => 0))->select('catId', 'catName')->get();
+            $categories = DB::table('image_category')->where(array('is_deleted' => 0))->where(array('user_id' => Auth::User()->id))->select('catId', 'catName')->get();
         } else {
-            $categories = DB::table('status_image_category')->select('catId', 'catName')->where('catName', 'like', '%' . $search . '%')->where('is_deleted', 0)->limit(10)->get();
+            $categories = DB::table('image_category')->select('catId', 'catName')->where('catName', 'like', '%' . $search . '%')->where(array('user_id' => Auth::User()->id))->where('is_deleted', 0)->limit(10)->get();
         }
 
         $response = array();
@@ -171,7 +176,7 @@ class MasterController extends Controller
         return response()->json($response);
     }
 
-    public function add_status_images(Request $req)
+    public function add_images(Request $req)
     {
         if (empty($req->itemId)) {
             $rules = array(
@@ -190,30 +195,32 @@ class MasterController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         } else {
-            $data = $this->MasterModel->add_status_images($req->all());
+            $data = $this->MasterModel->add_images($req->all());
             return $data;
         }
     }
 
-    public function status_images_list(Request $request)
+    public function images_list(Request $request)
     {
         if ($request->ajax()) {
-            $builder = DB::table('status_images as si');
+            $builder = DB::table('images as i');
             if ($request->category_id != '') {
-                $builder->where('si.catId', $request->category_id);
+                $builder->where('i.catId', $request->category_id);
             }
-            $builder->where('si.is_deleted', '0');
-            $builder->join('status_image_category as sic', 'sic.catId', '=', 'si.catId');
-            $builder->select('si.id', 'sic.catName', 'sic.slug_name', 'si.images');
+            $builder->where('i.is_deleted', '0');
+            $builder->where(array('i.user_id' => Auth::User()->id));
+            $builder->join('image_category as ic', 'ic.catId', '=', 'i.catId');
+            $builder->join('users as u', 'u.id', '=', 'i.user_id');
+            $builder->select('i.id', 'ic.catName', 'ic.slug_name', 'i.images', 'i.created_at', 'u.name');
             $result = $builder->get();
             return Datatables::of($result)
                 ->addIndexColumn()
                 ->editColumn('images', function ($row) {
-                    $url = asset('images/statusimages/' . $row->slug_name);
+                    $url = asset('images/' . $row->slug_name);
                     return '<a target="_blank" href="' . $url . '/' . $row->images . '"><img src=" ' . $url . '/' . $row->images . ' " height="100"></a>';
                 })
                 ->addColumn('action', function ($row) {
-                    $update_btn = '<button class="btn btn-link" onclick="edit_status_image(this)" data-val="' . $row->id . '"><i class="far fa-edit"></i></button>';
+                    $update_btn = '<button class="btn btn-link" onclick="edit_image(this)" data-val="' . $row->id . '"><i class="far fa-edit"></i></button>';
                     $delete_btn = '<button data-toggle="modal" target="_blank" class="btn btn-link" onclick="editable_remove(this)" data-val="' . $row->id . '" tabindex="-1"><i class="fa fa-trash-alt tx-danger"></i></button>';
                     return $update_btn . $delete_btn;
                 })
@@ -222,17 +229,17 @@ class MasterController extends Controller
         }
     }
 
-    public function delete_status_images(Request $req)
+    public function delete_images(Request $req)
     {
-        $data = $this->MasterModel->delete_status_images($req->all());
+        $data = $this->MasterModel->delete_images($req->all());
         return $data;
     }
 
-    public function get_status_images_data(Request $request)
+    public function get_images_data(Request $request)
     {
         if ($request->ajax()) {
-            $itemdata = DB::table('status_images as si')
-                ->join('status_image_category as sic', 'sic.catId', '=', 'si.catId')
+            $itemdata = DB::table('images as si')
+                ->join('image_category as sic', 'sic.catId', '=', 'si.catId')
                 ->where(array('id' => $request->id))
                 ->select('si.*', 'sic.catName', 'sic.slug_name')
                 ->get();
@@ -243,7 +250,7 @@ class MasterController extends Controller
                 'catId' => $item->catId,
                 'id' => $item->id,
                 'catName' => $item->catName,
-                'image' => asset('images/statusimages/' . $item->slug_name) . '/' . $item->images,
+                'image' => asset('images/' . $item->slug_name) . '/' . $item->images,
             ]);
         }
         $response = array('st' => "success", "msg" => $data);
@@ -251,13 +258,13 @@ class MasterController extends Controller
     }
 
 
-    // Status Video Catyegory Data
+    // Video Catyegory Data
 
-    public function add_status_video_category(Request $req)
+    public function add_video_category(Request $req)
     {
         if (empty($req->catId)) {
             $rules = array(
-                'category' => 'required|unique:status_video_category,catName',
+                'category' => 'required|unique:video_category,catName',
                 'image' => 'required|mimes:jpeg,jpg,png,gif',
             );
         } else {
@@ -273,23 +280,27 @@ class MasterController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         } else {
-            $data = $this->MasterModel->add_status_video_category($req->all());
+            $data = $this->MasterModel->add_video_category($req->all());
             return $data;
         }
     }
 
-    public function status_video_category_list(Request $request)
+    public function video_category_list(Request $request)
     {
         if ($request->ajax()) {
-            $data = DB::table('status_video_category')->where(array('is_deleted' => 0));
+            $data = DB::table('video_category as vc');
+            $data->where(array('vc.is_deleted' => 0));
+            $data->join('users as u', 'u.id', '=', 'vc.user_id');
+            $data->where(array('vc.user_id' => Auth::User()->id));
+            $data->get('vc.*', 'u.name');
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->editColumn('image', function ($row) {
-                    $url = asset('images/statusvideos/' . $row->slug_name);
+                    $url = asset('videos/' . $row->slug_name);
                     return '<a target="_blank" href="' . $url . '/' . $row->image . '"><img src="  ' . $url . '/' . $row->image . ' " height="100"></a>';
                 })
                 ->addColumn('action', function ($row) {
-                    $update_btn = '<button title="' . $row->catName . '" class="btn btn-link" onclick="edit_status_video_category(this)" data-val="' . $row->catId . '"><i class="far fa-edit"></i></button>';
+                    $update_btn = '<button title="' . $row->catName . '" class="btn btn-link" onclick="edit_video_category(this)" data-val="' . $row->catId . '"><i class="far fa-edit"></i></button>';
                     $delete_btn = '<button data-toggle="modal" target="_blank"  title="' . $row->catName . '" class="btn btn-link" onclick="editable_remove(this)" data-val="' . $row->catId . '" tabindex="-1"><i class="fa fa-trash-alt tx-danger"></i></button>';
                     return $update_btn . $delete_btn;
                 })
@@ -298,36 +309,36 @@ class MasterController extends Controller
         }
     }
 
-    public function delete_status_video_category(Request $req)
+    public function delete_video_category(Request $req)
     {
-        $data = $this->MasterModel->delete_status_video_category($req->all());
+        $data = $this->MasterModel->delete_video_category($req->all());
         return $data;
     }
 
-    public function get_status_video_category_data(Request $request)
+    public function get_video_category_data(Request $request)
     {
         if ($request->ajax()) {
-            $categorydata = DB::table('status_video_category')->where(array('catId' => $request->id))->first();
+            $categorydata = DB::table('video_category')->where(array('catId' => $request->id))->first();
         }
         $data = array();
         $data = ([
             'catId' => $categorydata->catId,
             'catName' => $categorydata->catName,
-            'image' => asset('images/statusvideos/' . $categorydata->slug_name) . '/' . $categorydata->image,
+            'image' => asset('videos/' . $categorydata->slug_name) . '/' . $categorydata->image,
         ]);
         $response = array('st' => "success", "msg" => $data);
         return response()->json($response);
     }
 
-    // Status Video Data
+    // Video Data
 
-    public function get_status_video_Category(Request $request)
+    public function get_video_Category(Request $request)
     {
         $search = $request->searchTerm;
         if ($search == '') {
-            $categories = DB::table('status_video_category')->where(array('is_deleted' => 0))->select('catId', 'catName')->get();
+            $categories = DB::table('video_category')->where(array('is_deleted' => 0))->where(array('user_id' => Auth::User()->id))->select('catId', 'catName')->get();
         } else {
-            $categories = DB::table('status_video_category')->select('catId', 'catName')->where('catName', 'like', '%' . $search . '%')->where('is_deleted', 0)->limit(10)->get();
+            $categories = DB::table('video_category')->select('catId', 'catName')->where('catName', 'like', '%' . $search . '%')->where(array('user_id' => Auth::User()->id))->where('is_deleted', 0)->limit(10)->get();
         }
 
         $response = array();
@@ -340,7 +351,7 @@ class MasterController extends Controller
         return response()->json($response);
     }
 
-    public function add_status_videos(Request $req)
+    public function add_videos(Request $req)
     {
         if (empty($req->videoId)) {
             $rules = array(
@@ -359,30 +370,32 @@ class MasterController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         } else {
-            $data = $this->MasterModel->add_status_videos($req->all());
+            $data = $this->MasterModel->add_videos($req->all());
             return $data;
         }
     }
 
-    public function status_videos_list(Request $request)
+    public function videos_list(Request $request)
     {
         if ($request->ajax()) {
-            $builder = DB::table('status_videos as sv');
+            $builder = DB::table('videos as v');
             if ($request->category_id != '') {
-                $builder->where('sv.catId', $request->category_id);
+                $builder->where('v.catId', $request->category_id);
             }
-            $builder->where('sv.is_deleted', '0');
-            $builder->join('status_video_category as svc', 'svc.catId', '=', 'sv.catId');
-            $builder->select('sv.id', 'svc.catName', 'svc.slug_name', 'sv.videos');
+            $builder->where('v.is_deleted', '0');
+            $builder->where(array('v.user_id' => Auth::User()->id));
+            $builder->join('users as u', 'u.id', '=', 'v.user_id');
+            $builder->join('video_category as vc', 'vc.catId', '=', 'v.catId');
+            $builder->select('v.id', 'vc.catName', 'vc.slug_name', 'v.videos', 'v.created_at', 'u.name');
             $result = $builder->get();
             return Datatables::of($result)
                 ->addIndexColumn()
                 ->editColumn('videos', function ($row) {
-                    $url = asset('images/statusvideos/' . $row->slug_name);
+                    $url = asset('videos/' . $row->slug_name);
                     return '<a target="_blank" href="' . $url . '/' . $row->videos . '"><video controls src=" ' . $url . '/' . $row->videos . ' "width="180"></a>';
                 })
                 ->addColumn('action', function ($row) {
-                    $update_btn = '<button class="btn btn-link" onclick="edit_status_video(this)" data-val="' . $row->id . '"><i class="far fa-edit"></i></button>';
+                    $update_btn = '<button class="btn btn-link" onclick="edit_video(this)" data-val="' . $row->id . '"><i class="far fa-edit"></i></button>';
                     $delete_btn = '<button data-toggle="modal" target="_blank" class="btn btn-link" onclick="editable_remove(this)" data-val="' . $row->id . '" tabindex="-1"><i class="fa fa-trash-alt tx-danger"></i></button>';
                     return $update_btn . $delete_btn;
                 })
@@ -391,17 +404,17 @@ class MasterController extends Controller
         }
     }
 
-    public function delete_status_videos(Request $req)
+    public function delete_videos(Request $req)
     {
-        $data = $this->MasterModel->delete_status_videos($req->all());
+        $data = $this->MasterModel->delete_videos($req->all());
         return $data;
     }
 
-    public function get_status_videos_data(Request $request)
+    public function get_videos_data(Request $request)
     {
         if ($request->ajax()) {
-            $videodata = DB::table('status_videos as sv')
-                ->join('status_video_category as svc', 'svc.catId', '=', 'sv.catId')
+            $videodata = DB::table('videos as sv')
+                ->join('video_category as svc', 'svc.catId', '=', 'sv.catId')
                 ->where(array('id' => $request->id))
                 ->select('sv.*', 'svc.catName', 'svc.slug_name')
                 ->get();
@@ -412,7 +425,7 @@ class MasterController extends Controller
                 'catId' => $video->catId,
                 'id' => $video->id,
                 'catName' => $video->catName,
-                'video' => asset('images/statusvideos/' . $video->slug_name) . '/' . $video->videos,
+                'video' => asset('videos/' . $video->slug_name) . '/' . $video->videos,
             ]);
         }
         $response = array('st' => "success", "msg" => $data);

@@ -11,6 +11,7 @@ Route::get('/admin/login', function () {
     return view('admin.auth.login');
 });
 Route::controller(LoginController::class)->group(function () {
+    Route::get('/admin', 'login')->name('login');
     Route::get('/admin/login', 'login')->name('login');
     Route::post('/admin/login_data', 'login_data');
     Route::get('/admin/logout', 'logout');
@@ -28,43 +29,35 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::post('admin/delete_user_data', [MasterController::class, 'delete_user_data']);
     Route::post('admin/get_user_data', [MasterController::class, 'get_user_data']);
 
-    // Status Image Category
-    Route::view('admin/status_image_category', 'Admin/Master/status_image_category', ['title' => 'status_image_category']);
-    Route::get('admin/status_image_category_list', [MasterController::class, 'status_image_category_list'])->name('status_image_category_list');  // list
-    Route::post('admin/add_status_image_category', [MasterController::class, 'add_status_image_category']);
-    Route::post('admin/delete_status_image_category', [MasterController::class, 'delete_status_image_category']);
-    Route::post('admin/get_status_image_category_data', [MasterController::class, 'get_status_image_category_data']);
+    // Image Category
+    Route::view('admin/image_category', 'Admin/Master/image_category', ['title' => 'image_category']);
+    Route::get('admin/image_category_list', [MasterController::class, 'image_category_list'])->name('admin/image_category_list');  // list
+    Route::post('admin/add_image_category', [MasterController::class, 'add_image_category']);
+    Route::post('admin/delete_image_category', [MasterController::class, 'delete_image_category']);
+    Route::post('admin/get_image_category_data', [MasterController::class, 'get_image_category_data']);
 
-    // Status Image
-    Route::view('admin/status_image', 'Admin/Master/status_image', ['title' => 'status_image']);
-    Route::get('admin/status_images_list', [MasterController::class, 'status_images_list'])->name('status_images_list');  // list
-    Route::post('admin/get_status_image_Category', [MasterController::class, 'get_status_image_Category']);
-    Route::post('admin/add_status_images', [MasterController::class, 'add_status_images']);
-    Route::post('admin/delete_status_images', [MasterController::class, 'delete_status_images']);
-    Route::post('admin/get_status_images_data', [MasterController::class, 'get_status_images_data']);
+    // Images
+    Route::view('admin/images', 'Admin/Master/images', ['title' => 'images']);
+    Route::get('admin/images_list', [MasterController::class, 'images_list'])->name('admin/images_list');  // list
+    Route::post('admin/get_image_Category', [MasterController::class, 'get_image_Category']);
+    Route::post('admin/add_images', [MasterController::class, 'add_images']);
+    Route::post('admin/delete_images', [MasterController::class, 'delete_images']);
+    Route::post('admin/get_images_data', [MasterController::class, 'get_images_data']);
 
-    // App By Image Category
-    Route::view('admin/app_by_image_category', 'Admin/Master/app_by_image_category', ['title' => 'app_by_image_category']);
-    Route::post('admin/getApp', [MasterController::class, 'getApp']);
-    Route::post('admin/add_app_by_image_category', [MasterController::class, 'add_app_by_image_category']);
-    Route::get('admin/app_by_image_category_list', [MasterController::class, 'app_by_image_category_list'])->name('app_by_image_category_list');  // list
-    Route::post('admin/delete_app_by_image_category', [MasterController::class, 'delete_app_by_image_category']);
-    Route::post('admin/get_app_by_image_category_data', [MasterController::class, 'get_app_by_image_category_data']);
+    //Video Category
+    Route::view('admin/video_category', 'Admin/Master/video_category', ['title' => 'video_category']);
+    Route::get('admin/video_category_list', [MasterController::class, 'video_category_list'])->name('admin/video_category_list');  // list
+    Route::post('admin/add_video_category', [MasterController::class, 'add_video_category']);
+    Route::post('admin/delete_video_category', [MasterController::class, 'delete_video_category']);
+    Route::post('admin/get_video_category_data', [MasterController::class, 'get_video_category_data']);
 
-    //Status Video Category
-    Route::view('admin/status_video_category', 'Admin/Master/status_video_category', ['title' => 'status_video_category']);
-    Route::get('admin/status_video_category_list', [MasterController::class, 'status_video_category_list'])->name('status_video_category_list');  // list
-    Route::post('admin/add_status_video_category', [MasterController::class, 'add_status_video_category']);
-    Route::post('admin/delete_status_video_category', [MasterController::class, 'delete_status_video_category']);
-    Route::post('admin/get_status_video_category_data', [MasterController::class, 'get_status_video_category_data']);
-
-    //Status Video 
-    Route::view('admin/status_video', 'Admin/Master/status_video', ['title' => 'status_video']);
-    Route::get('admin/status_videos_list', [MasterController::class, 'status_videos_list'])->name('status_videos_list');  // list
-    Route::post('admin/get_status_video_Category', [MasterController::class, 'get_status_video_Category']);
-    Route::post('admin/add_status_videos', [MasterController::class, 'add_status_videos']);
-    Route::post('admin/delete_status_videos', [MasterController::class, 'delete_status_videos']);
-    Route::post('admin/get_status_videos_data', [MasterController::class, 'get_status_videos_data']);
+    //Videos 
+    Route::view('admin/videos', 'Admin/Master/videos', ['title' => 'videos']);
+    Route::get('admin/videos_list', [MasterController::class, 'videos_list'])->name('admin/videos_list');  // list
+    Route::post('admin/get_video_Category', [MasterController::class, 'get_video_Category']);
+    Route::post('admin/add_videos', [MasterController::class, 'add_videos']);
+    Route::post('admin/delete_videos', [MasterController::class, 'delete_videos']);
+    Route::post('admin/get_videos_data', [MasterController::class, 'get_videos_data']);
 });
 
 // WEB Site

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 21, 2023 at 01:37 PM
+-- Generation Time: Feb 27, 2023 at 05:02 AM
 -- Server version: 10.4.25-MariaDB
 -- PHP Version: 8.1.10
 
@@ -36,6 +36,56 @@ CREATE TABLE `failed_jobs` (
   `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `images`
+--
+
+CREATE TABLE `images` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `catId` int(11) NOT NULL,
+  `images` longtext NOT NULL,
+  `is_new` int(11) NOT NULL DEFAULT 0 COMMENT 'true =1,false =0',
+  `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6),
+  `updated_at` datetime(6) DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `images`
+--
+
+INSERT INTO `images` (`id`, `user_id`, `catId`, `images`, `is_new`, `created_at`, `updated_at`, `is_deleted`) VALUES
+(1, 1, 1, 'ce65bc446ddbeb6e2891b7bdc8239837.png', 0, '2023-02-22 05:15:30.543084', NULL, 0),
+(2, 3, 2, '667b2235a97ddba58d705d2c809edad4.png', 0, '2023-02-22 05:40:47.844286', NULL, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `image_category`
+--
+
+CREATE TABLE `image_category` (
+  `catId` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `image` longtext NOT NULL,
+  `catName` varchar(255) NOT NULL,
+  `slug_name` text NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `updated_at` datetime(6) DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `image_category`
+--
+
+INSERT INTO `image_category` (`catId`, `user_id`, `image`, `catName`, `slug_name`, `created_at`, `updated_at`, `is_deleted`) VALUES
+(1, 1, 'c912fdac80906493f85c8577505a2f73.jpg', 'XYZ', 'xyz', '2023-02-21 19:24:14.480617', NULL, 0),
+(2, 3, '9ebe09fa0fe9f5326b4f929f695d7bc3.png', 'ABCD', 'abcd', '2023-02-22 11:05:58.675887', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -93,42 +143,6 @@ CREATE TABLE `personal_access_tokens` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `status_images`
---
-
-CREATE TABLE `status_images` (
-  `id` int(11) NOT NULL,
-  `catId` int(11) NOT NULL,
-  `images` longtext NOT NULL,
-  `is_new` int(11) NOT NULL DEFAULT 0 COMMENT 'true =1,false =0',
-  `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6),
-  `created_by` tinyint(1) DEFAULT NULL,
-  `updated_at` datetime(6) DEFAULT NULL,
-  `updated_by` tinyint(1) DEFAULT NULL,
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `status_image_category`
---
-
-CREATE TABLE `status_image_category` (
-  `catId` int(11) NOT NULL,
-  `image` longtext NOT NULL,
-  `catName` varchar(255) NOT NULL,
-  `slug_name` text NOT NULL,
-  `created_at` datetime(6) NOT NULL DEFAULT current_timestamp(6),
-  `created_by` tinyint(1) DEFAULT NULL,
-  `updated_at` datetime(6) DEFAULT NULL,
-  `updated_by` tinyint(1) DEFAULT NULL,
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `users`
 --
 
@@ -149,7 +163,57 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
 (1, 'admin', 'admin', '2023-01-20 12:30:07', '$2y$10$vFajGFE2OSJNIiMRmlBtxOoCMo8BCX9GjsMlnUxjszgG4fNT7jlma', NULL, '2023-01-20 12:30:07', NULL),
-(2, 'User', 'admin@gmail.com', NULL, '$2y$10$T3CXtWAsSQdj6RRudSPH2OqBd2MHV0CvcFF9HQA3kbzXe7cknqg0m', '0FlF2YGLlAxGDya', NULL, NULL);
+(3, 'User', 'user@gmail.com', NULL, '$2y$10$oD5WlKPTgnidfuqN3IPR0eYNslFE0L6c9DPwlF6YHl/k3JTHYQG7a', 'Y8OgrkbY48CrI8C', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `videos`
+--
+
+CREATE TABLE `videos` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `catId` int(11) NOT NULL,
+  `videos` longtext NOT NULL,
+  `is_new` int(11) NOT NULL DEFAULT 0 COMMENT 'true =1,false =0',
+  `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6),
+  `updated_at` datetime(6) DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `videos`
+--
+
+INSERT INTO `videos` (`id`, `user_id`, `catId`, `videos`, `is_new`, `created_at`, `updated_at`, `is_deleted`) VALUES
+(2, 1, 2, '5ebfcd52ebc844acf73a257694d6b392.mp4', 0, '2023-02-22 05:54:57.687925', NULL, 0),
+(3, 3, 3, '5ef48726f118f756b821e8fd70cb97b1.mp4', 0, '2023-02-22 05:45:26.579354', NULL, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `video_category`
+--
+
+CREATE TABLE `video_category` (
+  `catId` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `image` longtext NOT NULL,
+  `catName` varchar(255) NOT NULL,
+  `slug_name` text NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `updated_at` datetime(6) DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `video_category`
+--
+
+INSERT INTO `video_category` (`catId`, `user_id`, `image`, `catName`, `slug_name`, `created_at`, `updated_at`, `is_deleted`) VALUES
+(2, 1, '82cedb828ee9f03b9aab4a4498a6b4f6.jpg', 'ABCD', 'xyz', '2023-02-22 11:14:21.889768', NULL, 0),
+(3, 3, 'b9cbeccd053a57effd322e1299b35dee.png', 'XYZ', 'xyz', '2023-02-22 11:14:54.123916', NULL, 0);
 
 --
 -- Indexes for dumped tables
@@ -161,6 +225,18 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `re
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
+-- Indexes for table `images`
+--
+ALTER TABLE `images`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `image_category`
+--
+ALTER TABLE `image_category`
+  ADD PRIMARY KEY (`catId`);
 
 --
 -- Indexes for table `migrations`
@@ -183,23 +259,23 @@ ALTER TABLE `personal_access_tokens`
   ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
 
 --
--- Indexes for table `status_images`
---
-ALTER TABLE `status_images`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `status_image_category`
---
-ALTER TABLE `status_image_category`
-  ADD PRIMARY KEY (`catId`);
-
---
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `users_email_unique` (`email`);
+
+--
+-- Indexes for table `videos`
+--
+ALTER TABLE `videos`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `video_category`
+--
+ALTER TABLE `video_category`
+  ADD PRIMARY KEY (`catId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -210,6 +286,18 @@ ALTER TABLE `users`
 --
 ALTER TABLE `failed_jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `images`
+--
+ALTER TABLE `images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `image_category`
+--
+ALTER TABLE `image_category`
+  MODIFY `catId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `migrations`
@@ -224,22 +312,22 @@ ALTER TABLE `personal_access_tokens`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `status_images`
---
-ALTER TABLE `status_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `status_image_category`
---
-ALTER TABLE `status_image_category`
-  MODIFY `catId` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `videos`
+--
+ALTER TABLE `videos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `video_category`
+--
+ALTER TABLE `video_category`
+  MODIFY `catId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

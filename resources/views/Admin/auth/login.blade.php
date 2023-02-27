@@ -7,9 +7,9 @@
     <meta name="description" content="Wallpaper">
     <meta name="author" content="mj">
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset ('logo.jpg') }}" type="image/x-icon" />
+    <link rel="icon" href="" type="image/x-icon" />
     <!-- Title -->
-    <title>Wallpaper | Login</title>
+    <title>Login</title>
     <!---Style css-->
     <link href="{{ asset ('assets/css/style.css') }}" rel="stylesheet">
     <link href="{{ asset ('assets/css/custom-style.css') }}" rel="stylesheet">
